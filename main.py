@@ -201,4 +201,47 @@ async def on_message(message):
         result = pow(2,x)
         await message.channel.send(f"{x} potęga dwójki to: {result}")
 
+    if message.content == "!silnia":
+        await message.channel.send("Podaj liczbę: ")
+        def fact(a):
+            return a.author == message.author and a.channel == message.channel
+
+        try:
+            msg12 = await client.wait_for("message", check=fact, timeout=30)
+            x = int(msg12.content)
+        except:
+            return await message.channel.send("Przekroczono limit czasu lub podano zły format liczby")
+        if x < 0:
+            return await message.channel.send("BŁĄD: silnia z liczby z ujemnej")
+        result = math.factorial(x)
+        await message.channel.send(f"Silnia liczby {x} to: {result}")
+
+    if message.content == "!newton":
+        await message.channel.send("Dwumian Newtona składa się z dwóch liczb: n oraz k.")
+        await message.channel.send("Podaj najpierw n, a potem k.")
+
+        def check(msg):
+            return msg.author == message.author and msg.channel == message.channel
+
+        try:
+            msg_n = await client.wait_for("message", check=check, timeout=30)
+            n = int(msg_n.content)
+        except:
+            return await message.channel.send("Przekroczono limit czasu lub podano zły format liczby")
+
+        try:
+            msg_k = await client.wait_for("message", check=check, timeout=30)
+            k = int(msg_k.content)
+        except:
+            return await message.channel.send("Przekroczono limit czasu lub podano zły format liczby")
+
+        if n < 0 or k < 0:
+            return await message.channel.send("BŁĄD: jedna z liczb jest ujemna")
+
+        if k > n:
+            return await message.channel.send("BŁĄD: k nie może być większe od n")
+
+        result = math.factorial(n) // (math.factorial(k) * math.factorial(n - k))
+        await message.channel.send(f"Dwumian Newtona dla liczb {n} oraz {k} to: {result}")
+
 client.run("TOKEN")
