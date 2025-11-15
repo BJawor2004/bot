@@ -159,4 +159,46 @@ async def on_message(message):
         result4 = pow(p,q)
         await message.channel.send(f"Wynik: {result4}")
 
+    if message.content == "!kwadratowy":
+        await message.channel.send("Podaj liczbę: ")
+        def pierw(a):
+            return a.author == message.author and a.channel == message.channel
+
+        try:
+            msg9 = await client.wait_for("message", check=pierw, timeout=30)
+            x = float(msg9.content)
+        except:
+            return await message.channel.send("Przekroczono limit czasu lub podano zły format liczby")
+
+        if x < 0:
+            return await message.channel.send("BŁĄD: liczba ujemma pod pierwiastkiem rzeczywistym")
+        result5 = math.sqrt(x)
+        await message.channel.send(f"Wynik: {result5}")
+
+    if message.content == "!kwadrat":
+        await message.channel.send("Podaj liczbę: ")
+        def square(a):
+            return a.author == message.author and a.channel == message.channel
+
+        try:
+            msg10 = await client.wait_for("message", check=square, timeout=30)
+            x = float(msg10.content)
+        except:
+            return await message.channel.send("Przekroczono limit czasu lub podano zły format liczby")
+        result = pow(x,2)
+        await message.channel.send(f"Kwadrat liczby {x} to: {result}")
+
+    if message.content == "!dwojka":
+        await message.channel.send("Podaj potęgę: ")
+        def two(a):
+            return a.author == message.author and a.channel == message.channel
+
+        try:
+            msg11 = await client.wait_for("message", check=two, timeout=30)
+            x = float(msg11.content)
+        except:
+            return await message.channel.send("Przekroczono limit czasu lub podano zły format liczby")
+        result = pow(2,x)
+        await message.channel.send(f"{x} potęga dwójki to: {result}")
+
 client.run("TOKEN")
