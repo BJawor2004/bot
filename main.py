@@ -243,5 +243,80 @@ async def on_message(message):
 
         result = math.factorial(n) // (math.factorial(k) * math.factorial(n - k))
         await message.channel.send(f"Dwumian Newtona dla liczb {n} oraz {k} to: {result}")
+    if message.content == "!kwadratowe":
+        await message.channel.send("Ten program skupia się na obliczaniu równań kwadratowych")
+        await message.channel.send("Podaj współczynnik a:")
+
+        def quadratic(msg):
+            return msg.author == message.author and msg.channel == message.channel
+
+        try:
+            msg = await client.wait_for("message", check=quadratic, timeout=30)
+            a = float(msg.content)
+        except:
+            return await message.channel.send("Przekroczono limit czasu lub podano zły format liczby")
+
+        await message.channel.send("Podaj współczynnik b: ")
+        try:
+            msg = await client.wait_for("message", check=quadratic, timeout=30)
+            b = float(msg.content)
+        except:
+            return await message.channel.send("Przekroczono limit czasu lub podano zły format liczby")
+
+        await message.channel.send("Podaj współczynnik c: ")
+        try:
+            msg = await client.wait_for("message", check=quadratic, timeout=30)
+            c = float(msg.content)
+        except:
+            return await message.channel.send("Przekroczono limit czasu lub podano zły format liczby")
+
+        delta = b * b - 4 * a * c
+
+        if delta > 0:
+            await message.channel.send("Delta jest większa od zera, więc równanie posiada 2 rozwiązania: ")
+            x1 = (-b - math.sqrt(delta)) / (2 * a)
+            x2 = (-b + math.sqrt(delta)) / (2 * a)
+            await message.channel.send(f"x1 = {x1}, x2 = {x2}")
+
+        elif delta == 0:
+            await message.channel.send("Delta jest równa 0, więc równanie ma jedno rozwiązanie: ")
+            x0 = -b / (2 * a)
+            await message.channel.send(f"x0 = {x0}")
+
+        else:
+            return await message.channel.send(
+                "Delta jest mniejsza od zera, więc równanie nie ma rozwiązań rzeczywistych.")
+
+    if message.content == "!zapisz":
+        await message.channel.send("Podaj tekst do zapisania w pliku:")
+
+        def check(msg):
+            return msg.author == message.author and msg.channel == message.channel
+
+        try:
+            msg = await client.wait_for("message", timeout=30, check=check)
+            tekst = msg.content
+        except:
+            return await message.channel.send("Czas minął lub błąd wejścia.")
+
+        with open("zapis.txt", "a", encoding="utf-8") as f:
+            f.write(tekst + "\n")
+
+        await message.channel.send("Zapisano do pliku!")
+    if message.content.startswith("!generuj "):
+        filename = message.content.split(" ", 1)[1]
+
+        await message.channel.send("Podaj tekst do zapisania w pliku:")
+
+        def check(msg):
+            return msg.author == message.author and msg.channel == message.channel
+
+        msg_txt = await client.wait_for("message", check=check, timeout=30)
+        tekst = msg_txt.content
+
+        with open(filename, "w", encoding="utf-8") as f:
+            f.write(tekst)
+
+        await message.channel.send("Plik gotowy do pobrania:", file=discord.File(filename))
 
 client.run("TOKEN")
