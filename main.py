@@ -1,5 +1,7 @@
+import itertools
 import math
 import discord
+from sqlalchemy.util import await_only
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -303,7 +305,7 @@ async def on_message(message):
             f.write(tekst + "\n")
 
         await message.channel.send("Zapisano do pliku!")
-    if message.content.startswith("!generuj "):
+    if message.content("!generuj "):
         filename = message.content.split(" ", 1)[1]
 
         await message.channel.send("Podaj tekst do zapisania w pliku:")
@@ -318,5 +320,48 @@ async def on_message(message):
             f.write(tekst)
 
         await message.channel.send("Plik gotowy do pobrania:", file=discord.File(filename))
+
+    if message.content.startswith("!crunch"):
+        await message.channel.send("Podaj minimalną długość kombinacji: ")
+
+    def check(msg):
+        return msg.author == message.author and msg.channel == message.channel
+
+    try:
+        msg = await client.wait_for("message", timeout=30, check=check)
+        min_len = int(msg.content)
+    except:
+        return await message.channel.send("Czas minął lub podano zły format liczby.")
+
+    await message.channel.send("Podaj maksymalną długość kombinacji: ")
+    try:
+        msg = await client.wait_for("message", timeout=30, check=check)
+        max_len = int(msg.content)
+    except:
+        return await message.channel.send("Czas minął lub podano zły format liczby.")
+
+    await message.channel.send("Podaj zestaw znaków (np. abc123): ")
+    try:
+        msg = await client.wait_for("message", timeout=30, check=check)
+        charset = msg.content
+    except:
+        return await message.channel.send("Czas minął lub podano błędny format.")
+
+
+    await message.channel.send(f"Generowanie kombinacji od długości {min_len} do {max_len}...")
+    combinations = []
+    for length in range(min_len, max_len + 1):
+        for combo in itertools.product(charset, repeat=length):
+            combinations.append("".join(combo))
+            if len(combinations) >= 50:
+                await message.channel.send("\n".join(combinations))
+                combinations = []
+
+    if combinations:
+        await message.channel.send("\n".join(combinations))
+
+    await message.channel.send("Generowanie zakończone!")
+
+
 
 client.run("TOKEN")
